@@ -20,9 +20,26 @@ class UserCreateSerializer(serializers.ModelSerializer):
         # Ensure passwords match
         if attrs['password'] != attrs['confirm_password']:
             raise serializers.ValidationError({"message": "Passwords do not match."})
-
         # Validate password strength using Django’s built-in validators
-        validate_password(attrs['password'])
+        # validate_password(attrs['password'])
+
+        if User.objects.filter(username=attrs['username']).exists():
+            raise serializers.ValidationError({"message": "Username is already taken."})
+        
+        if len(attrs['full_name'].strip().split()) < 2:
+            raise serializers.ValidationError({"message": "Full name must include at least first and last name."})
+        
+        if ' ' in attrs['username']:
+            raise serializers.ValidationError({"message": "Username must not contain spaces."})
+        
+        if len(attrs['username']) < 3:
+            raise serializers.ValidationError({"message": "Username must be at least 3 characters long."})
+        if len(attrs['password']) < 8:
+            raise serializers.ValidationError({"message": "Password must be at least 8 characters long."})
+        if attrs['username'].lower() in attrs['password'].lower():
+            raise serializers.ValidationError({"message": "Password is too similar to the username."})
+        return attrs
+
 
     def create(self, validated_data):
         validated_data.pop('confirm_password')

@@ -17,14 +17,13 @@ class LoginView(TokenObtainPairView):
     """
 
     def post(self, request, *args, **kwargs):
-        email = request.data.get("email")
+        username = request.data.get("username")
         password = request.data.get("password")
 
-        if not email or not password:
-            return Response({"message": "Email and password are required."}, status=status.HTTP_400_BAD_REQUEST)
-
+        if not username or not password:
+            return Response({"message": "Username and password are required."}, status=status.HTTP_400_BAD_REQUEST)
         try:
-            user = authenticate(email=email, password=password)
+            user = authenticate(username=username, password=password)
 
             if user is not None:
                 
