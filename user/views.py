@@ -37,12 +37,13 @@ class LoginView(TokenObtainPairView):
                 }, status=status.HTTP_200_OK)
 
                 response.set_cookie(
-                key="access_token",
-                value=str(refresh.access_token),
-                httponly=True,
-                secure=True,  # Must be True in production
-                samesite="None"  # Only use "None" when `secure=True`
+                    key="access_token",
+                    value=str(refresh.access_token),
+                    httponly=True,
+                    secure=True,      
+                    samesite="None",
                 )
+
                 return response
         except User.DoesNotExist:
             return Response({"message": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
@@ -85,3 +86,25 @@ class CreateUserView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class LogoutView(APIView):
+    permission_classes = [LoginRequiredPermission]
+
+    def post(self, request):
+        try:
+
+            response = Response({"message": "Logout successful"}, status=status.HTTP_205_RESET_CONTENT)
+            response.delete_cookie(
+            "access_token",
+            path="/",
+            samesite="None"
+            )
+            response.delete_cookie(
+                "refresh_token",
+                path="/",
+                samesite="None"
+            )
+            return response
+        except Exception:
+            return Response({"message": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
