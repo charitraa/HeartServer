@@ -15,6 +15,7 @@ class GameHistory(models.Model):
     )
     score = models.IntegerField(default=0)
     level = models.CharField(max_length=10, choices=LEVEL_CHOICES)
+    time_taken = models.IntegerField(help_text="Time taken in seconds", default=0)
     date_played = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
